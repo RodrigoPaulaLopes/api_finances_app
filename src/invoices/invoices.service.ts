@@ -20,7 +20,7 @@ export class InvoicesService {
 
     public async findById(id, userId) {
         try {
-            const invoice = await this.invoicesRepository.findOne({ where: { id: id, user: {id: userId} } })
+            const invoice = await this.invoicesRepository.findOne({ where: { id: id, user: { id: userId } } })
 
             return invoice
         } catch (error) {
@@ -34,7 +34,7 @@ export class InvoicesService {
             const date_invoice = new Date(invoices.due_date)
 
             const status = current_date <= date_invoice ? "a pagar" : "atrasada"
-            
+
             const newInvoice: Invoices = {
                 title: invoices.title,
                 value: invoices.value,
@@ -53,11 +53,39 @@ export class InvoicesService {
         }
     }
 
-    public updateInvoice() {
-        return "update invoices"
+    public async updateInvoice(invoice, id, userId) {
+
+        try {
+            const oldInvoice = await this.invoicesRepository.findOne({ where: { id: id, user: { id: userId } } })
+            const current_date = new Date()
+            const date_invoice = new Date(invoice.due_date)
+
+            const status = current_date <= date_invoice ? "a pagar" : "atrasada"
+
+            oldInvoice.title = invoice.title
+            oldInvoice.value = invoice.value
+            oldInvoice.due_date = date_invoice
+            oldInvoice.payment_date = null
+            oldInvoice.status = status
+            oldInvoice.user = invoice.user
+
+            const newInvoice = await this.invoicesRepository.save(oldInvoice)
+            return newInvoice
+        } catch (error) {
+            return error
+        }
+
     }
 
-    public deleteInvoice() {
-        return "delete invoice"
+    public async deleteInvoice(id, userId) {
+        try {
+            const oldInvoice = await this.invoicesRepository.findOne({ where: { id: id, user: { id: userId }}})
+            const deletedInvoice = await this.invoicesRepository.delete(oldInvoice.id)
+
+            return deletedInvoice
+
+        } catch (error) {
+            return error
+        }
     }
 }

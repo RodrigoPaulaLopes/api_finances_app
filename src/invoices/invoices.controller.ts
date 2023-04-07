@@ -25,12 +25,14 @@ export class InvoicesController {
         return {"response": adding}
     }
 
-    @Put("update/:id")
-    public updateInvoice(@Body() invoice) {
-        return {"response": this.invoicesServices.updateInvoice()}
+    @Put("update/:userId/:id")
+    public async updateInvoice(@Body() invoice, @Param('id') id, @Param('userId') userId) {
+        const updatedInvoice = await this.invoicesServices.updateInvoice(invoice, id, userId)
+        return {"response": updatedInvoice}
     }
-    @Delete("delete")
-    public deleteInvoice() {
-        return {"response": this.invoicesServices.deleteInvoice()}
+    @Delete("delete/:userId/:id")
+    public async deleteInvoice(@Param('userId') userId, @Param('id') id) {
+        const deletedInvoice = await this.invoicesServices.deleteInvoice(id, userId)
+        return {"response": deletedInvoice}
     }
 }
